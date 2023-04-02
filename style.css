@@ -1,0 +1,19 @@
+/* css style sheet */
+
+/* ID - for only one tag */
+#welcome { font-style:italic; color:blue}
+
+/* CLASS - for many tags */
+.center {
+  text-align:center;
+  color:red;
+}
+body{
+    background-color: blue;
+}
+#viewListButton {
+    font-size: 5; 
+    font-style: blue
+}
+/* Descendant selector */
+ol ol { list-style-type: lower-alpha; }
