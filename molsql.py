@@ -199,10 +199,24 @@ class Database:
                 return False;
         #validate radius
         if(values[6].isnumeric==False or int(values[6])<=0 or len(values[6])==0):
-            print("val7")
+            print("val7");
             return False;
         return True;
-    
+    def validateRemoveElement(self, code):
+        total = self.cursor.execute(""" SELECT COUNT(*) FROM ELEMENTS""").fetchone();
+        #4 default that can not be removed
+        dict = self.element_name();
+        if(code in dict.keys()):
+            return False;
+        elif(code == "H" or code == "C" or code == "N" or code == "O"):
+            return False;
+        return True;
+    def removeElement(self, code):
+        try:
+            self.cursor.execute(f""" DELETE FROM Elements WHERE ELEMENT_CODE ={code}""");
+        except:
+            print("fail");
+
 if __name__ == "__main__":
     # db = Database(reset=True);
     # db.create_tables();
