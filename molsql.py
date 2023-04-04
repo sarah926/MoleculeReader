@@ -1,7 +1,8 @@
 import os;
 import sqlite3;
 import MolDisplay;
-header = """<html><script src="test.js"></script><head><link rel="stylesheet" type="text/css" href="styles.css" /></head>\n<body>""";
+from colour import Color
+header = """<html><script src="test.js"></script><head><link rel="stylesheet" type="text/css" href="style.css" /></head>\n<body>""";
 footer = """</body></html>""";
 class Database:
     
@@ -151,13 +152,17 @@ class Database:
         return returning;
 
     def makeMolListSVG(self):
-        list = header + """<ol style="border: 2px solid blue">\n"""
+        list = header + """ <h1>Current Molecule List</h1>""" +"""<ol style="border: 2px solid blue">\n"""
         mol_num = self.cursor.execute(f""" SELECT COUNT(*) FROM Molecules""").fetchone();
         mol_list =  self.cursor.execute(f""" SELECT NAME FROM Molecules""").fetchall();
         for i in range(0,int(mol_num[0])):
-            list = list + """   <li id="list1"><a href="/view/%s">%s</li>\n""" % (mol_list[i][0],mol_list[i][0])
-        list = list + """</ol>""" + footer;
-        print(list)
+            bond_num = self.cursor.execute(f""" SELECT COUNT(*) FROM MoleculeBond WHERE MOLECULE_ID = {i+1}""").fetchone();
+            atom_num = self.cursor.execute(f""" SELECT COUNT(*) FROM MoleculeAtom WHERE MOLECULE_ID = {i+1}""").fetchone();
+            list = list + """   <li id="list1"><a href="/view/%s">%s: [%d atoms %d bonds]</li>\n""" % (mol_list[i][0],mol_list[i][0], int(atom_num[0]), int(bond_num[0]))
+        list = list + """</ol>""" + """ <form action="home" enctype="multipart/form-data" method="post">
+        <button type="submit" id="back">Back</button>
+    </form>""" +footer;
+        #print(list)
         return list;
 
     def makeElementListSVG(self):
@@ -167,39 +172,71 @@ class Database:
         for i in range(0,len(dict)):
             elementList = elementList + """   <li id="list1"><a href="/element_list">%s: %s</li>\n""" % (keys[i], dict[keys[i]]);
         elementList = elementList + """</ol>""" + footer;
-        print(elementList);
+        #print(elementList);
         return elementList;
-
-if __name__ == "__main__":
-    db = Database(reset=True);
-    db.create_tables();
-    db['Elements'] = ( 1, 'H', 'Hydrogen', 'FFFFFF', '050505', '020202', 25 );
-    db['Elements'] = ( 6, 'C', 'Carbon', '808080', '010101', '000000', 40 );
-    db['Elements'] = ( 7, 'N', 'Nitrogen', '0000FF', '000005', '000002', 40 );
-    db['Elements'] = ( 8, 'O', 'Oxygen', 'FF0000', '050000', '020000', 40 );
-    fp = open( 'water-3D-structure-CT1000292221.sdf' );
-    db.add_molecule( 'Water', fp );
-    fp = open( 'caffeine-3D-structure-CT1001987571.sdf' );
-    db.add_molecule( 'Caffeine', fp );
-    fp = open( 'CID_31260.sdf' );
-    db.add_molecule( 'Isopentanol', fp );
-    # display tables
-    # print( db.conn.execute( "SELECT * FROM Elements;" ).fetchall() );
-    # print( db.conn.execute( "SELECT * FROM Molecules;" ).fetchall() );
-    # print( db.conn.execute( "SELECT * FROM Atoms;" ).fetchall() );
-    # print( db.conn.execute( "SELECT * FROM Bonds;" ).fetchall() );
-    # print( db.conn.execute( "SELECT * FROM MoleculeAtom;" ).fetchall() );
-    # print( db.conn.execute( "SELECT * FROM MoleculeBond;" ).fetchall() )
-    db = Database(reset=False); # or use default
-    db.create_tables();
-    MolDisplay.radius = db.radius();
-    MolDisplay.element_name = db.element_name();
-    MolDisplay.header += db.radial_gradients();
+    def validateElement(self, values):
+        print("hi");
+        #validate element number
+        if(values[0].isnumeric() == False or int(values[0])>118 or int(values[0])<0 or len(values[0]) == 0):
+            print("val1")
+            return False;
+        #validate element code
+        elif(len(values[1]) >2 or len(values[1]) ==0 or values[1].isnumeric() == True):
+            print("val2")
+            return False;
+        #validate elmenet name
+        elif(values[2].isnumeric()==True or len(values[2]) == 0):
+            print("val3")
+            return False;
+        #validate colors 1-3
+        elif(len(values[3])>0 and len(values[4]) >0 and len(values[5])>0):
+            try:
+                Color(values[3]);
+                Color(values[4]);
+                Color(values[5]);
+            except:
+                print("exc")
+                return False;
+        #validate radius
+        if(values[6].isnumeric==False or int(values[6])<=0 or len(values[6])==0):
+            print("val7")
+            return False;
+        return True;
     
-    for molecule in [ 'Water','Caffeine', 'Isopentanol' ]:
-        mol = db.load_mol( molecule );
-        mol.sort();
-        fp = open( molecule + ".svg", "w" );
-        fp.write( mol.svg() );
-        fp.close();
-    db.makeMolListSVG();
+if __name__ == "__main__":
+    # db = Database(reset=True);
+    # db.create_tables();
+    # db['Elements'] = ( 1, 'H', 'Hydrogen', 'FFFFFF', '050505', '020202', 25 );
+    # db['Elements'] = ( 6, 'C', 'Carbon', '808080', '010101', '000000', 40 );
+    # db['Elements'] = ( 7, 'N', 'Nitrogen', '0000FF', '000005', '000002', 40 );
+    # db['Elements'] = ( 8, 'O', 'Oxygen', 'FF0000', '050000', '020000', 40 );
+    # fp = open( 'water-3D-structure-CT1000292221.sdf' );
+    # db.add_molecule( 'Water', fp );
+    # fp = open( 'caffeine-3D-structure-CT1001987571.sdf' );
+    # db.add_molecule( 'Caffeine', fp );
+    # fp = open( 'CID_31260.sdf' );
+    # db.add_molecule( 'Isopentanol', fp );
+    # # display tables
+    # # print( db.conn.execute( "SELECT * FROM Elements;" ).fetchall() );
+    # # print( db.conn.execute( "SELECT * FROM Molecules;" ).fetchall() );
+    # # print( db.conn.execute( "SELECT * FROM Atoms;" ).fetchall() );
+    # # print( db.conn.execute( "SELECT * FROM Bonds;" ).fetchall() );
+    # # print( db.conn.execute( "SELECT * FROM MoleculeAtom;" ).fetchall() );
+    # # print( db.conn.execute( "SELECT * FROM MoleculeBond;" ).fetchall() )
+    # db = Database(reset=False); # or use default
+    # db.create_tables();
+    # MolDisplay.radius = db.radius();
+    # MolDisplay.element_name = db.element_name();
+    # MolDisplay.header += db.radial_gradients();
+    
+    # for molecule in [ 'Water','Caffeine', 'Isopentanol' ]:
+    #     mol = db.load_mol( molecule );
+    #     mol.sort();
+    #     fp = open( molecule + ".svg", "w" );
+    #     fp.write( mol.svg() );
+    #     fp.close();
+    # db.makeMolListSVG();
+    try:
+        b = Color("red");
+    except:
+        print(b);

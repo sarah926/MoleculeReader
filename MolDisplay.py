@@ -2,12 +2,12 @@ import molecule
 import molsql
 import pdb
 
-header = """<svg version="1.1" width="1000" height="1000"
+header = """<html><svg version="1.1" width="1000" height="1000"
                     xmlns="http://www.w3.org/2000/svg">""";
-footer = """</svg>""";
+footer = """</svg></html>""";
 offsetx = 500;
 offsety = 500;
-radius_header = """ """
+
 class Atom:
     def __init__(self, c_atom):
         self.c_atom = c_atom;

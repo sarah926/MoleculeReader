@@ -9,10 +9,10 @@
   color:red;
 }
 body{
-    background-color: blue;
+    background-color: lightblue;
 }
 #viewListButton {
-    font-size: 5; 
+    font-size: 20; 
     font-style: blue
 }
 /* Descendant selector */
