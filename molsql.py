@@ -206,14 +206,16 @@ class Database:
         total = self.cursor.execute(""" SELECT COUNT(*) FROM ELEMENTS""").fetchone();
         #4 default that can not be removed
         dict = self.element_name();
-        if(code in dict.keys()):
+        print(dict.keys())
+        print(code)
+        if(code not in dict.keys()):
             return False;
         elif(code == "H" or code == "C" or code == "N" or code == "O"):
             return False;
         return True;
     def removeElement(self, code):
         try:
-            self.cursor.execute(f""" DELETE FROM Elements WHERE ELEMENT_CODE ={code}""");
+            self.cursor.execute(f""" DELETE FROM Elements WHERE ELEMENT_CODE ='{code}'""");
         except:
             print("fail");
 

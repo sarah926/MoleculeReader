@@ -2985,12 +2985,13 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_char swig_types[4]
 #define SWIGTYPE_p_double swig_types[5]
 #define SWIGTYPE_p_molecule swig_types[6]
-#define SWIGTYPE_p_p_atom swig_types[7]
-#define SWIGTYPE_p_p_bond swig_types[8]
-#define SWIGTYPE_p_unsigned_char swig_types[9]
-#define SWIGTYPE_p_unsigned_short swig_types[10]
-static swig_type_info *swig_types[12];
-static swig_module_info swig_module = {swig_types, 11, 0, 0, 0, 0};
+#define SWIGTYPE_p_mx_wrapper swig_types[7]
+#define SWIGTYPE_p_p_atom swig_types[8]
+#define SWIGTYPE_p_p_bond swig_types[9]
+#define SWIGTYPE_p_unsigned_char swig_types[10]
+#define SWIGTYPE_p_unsigned_short swig_types[11]
+static swig_type_info *swig_types[13];
+static swig_module_info swig_module = {swig_types, 12, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3413,6 +3414,87 @@ SWIG_From_unsigned_SS_char  (unsigned char value)
 SWIGINTERN struct bond *new_bond(bond *bond){
     return bond;
   }
+
+SWIGINTERN int
+SWIG_AsVal_long (PyObject *obj, long* val)
+{
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    if (val) *val = PyInt_AsLong(obj);
+    return SWIG_OK;
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    long v = PyLong_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    long v = PyInt_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
+	if (val) *val = (long)(d);
+	return res;
+      }
+    }
+  }
+#endif
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_int (PyObject * obj, int *val)
+{
+  long v;
+  int res = SWIG_AsVal_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v < INT_MIN || v > INT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = (int)(v);
+    }
+  }  
+  return res;
+}
+
+SWIGINTERN struct mx_wrapper *new_mx_wrapper(int xrot,int yrot,int zrot){
+    mx_wrapper *mx;
+
+    mx = malloc( sizeof( mx_wrapper ) );
+    if ( (xrot!=0) && (yrot==0) && (zrot==0) )
+    {
+      xrotation( mx->xform_matrix, xrot );
+    }
+    if ( (xrot==0) && (yrot!=0) && (zrot==0) )
+    {
+      yrotation( mx->xform_matrix, yrot );
+    }
+    if ( (xrot==0) && (yrot==0) && (zrot!=0) )
+    {
+      zrotation( mx->xform_matrix, zrot );
+    }
+
+    return mx;
+  }
+SWIGINTERN void delete_mx_wrapper(struct mx_wrapper *self){
+    free( self );
+  }
 SWIGINTERN struct molecule *new_molecule(void){
     molecule *mol;
     mol = molmalloc( 0, 0 );
@@ -3449,6 +3531,9 @@ SWIGINTERN bond *molecule_get_bond(struct molecule *self,unsigned short i){
   }
 SWIGINTERN void molecule_sort(struct molecule *self){
     molsort( self );
+  }
+SWIGINTERN void molecule_xform(struct molecule *self,xform_matrix xform_matrix){
+    mol_xform( self, xform_matrix );
   }
 
 SWIGINTERNINLINE PyObject*
@@ -4434,6 +4519,143 @@ SWIGINTERN PyObject *bond_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
   return SWIG_Python_InitShadowInstance(args);
 }
 
+SWIGINTERN PyObject *_wrap_mx_wrapper_xform_matrix_set(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  struct mx_wrapper *arg1 = (struct mx_wrapper *) 0 ;
+  double (*arg2)[3] ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "mx_wrapper_xform_matrix_set", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mx_wrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mx_wrapper_xform_matrix_set" "', argument " "1"" of type '" "struct mx_wrapper *""'"); 
+  }
+  arg1 = (struct mx_wrapper *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_a_3__double, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "mx_wrapper_xform_matrix_set" "', argument " "2"" of type '" "double [3][3]""'"); 
+  } 
+  arg2 = (double (*)[3])(argp2);
+  {
+    if (arg2) {
+      size_t ii = 0;
+      for (; ii < (size_t)3; ++ii) {
+        if (arg2[ii]) {
+          size_t jj = 0;
+          for (; jj < (size_t)3; ++jj) arg1->xform_matrix[ii][jj] = arg2[ii][jj];
+        } else {
+          SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""xform_matrix""' of type '""double [3][3]""'");
+        }
+      }
+    } else {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""xform_matrix""' of type '""double [3][3]""'");
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mx_wrapper_xform_matrix_get(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  struct mx_wrapper *arg1 = (struct mx_wrapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double (*result)[3] = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mx_wrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mx_wrapper_xform_matrix_get" "', argument " "1"" of type '" "struct mx_wrapper *""'"); 
+  }
+  arg1 = (struct mx_wrapper *)(argp1);
+  result = (double (*)[3]) ((arg1)->xform_matrix);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_a_3__double, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_mx_wrapper(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  struct mx_wrapper *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "new_mx_wrapper", 3, 3, swig_obj)) SWIG_fail;
+  ecode1 = SWIG_AsVal_int(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_mx_wrapper" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = (int)(val1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_mx_wrapper" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_mx_wrapper" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (struct mx_wrapper *)new_mx_wrapper(arg1,arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_mx_wrapper, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_mx_wrapper(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  struct mx_wrapper *arg1 = (struct mx_wrapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mx_wrapper, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_mx_wrapper" "', argument " "1"" of type '" "struct mx_wrapper *""'"); 
+  }
+  arg1 = (struct mx_wrapper *)(argp1);
+  delete_mx_wrapper(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *mx_wrapper_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_mx_wrapper, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *mx_wrapper_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  return SWIG_Python_InitShadowInstance(args);
+}
+
 SWIGINTERN PyObject *_wrap_molecule_atom_max_set(PyObject *self, PyObject *args) {
   PyObject *resultobj = 0;
   struct molecule *arg1 = (struct molecule *) 0 ;
@@ -5065,6 +5287,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_molecule_xform(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  struct molecule *arg1 = (struct molecule *) 0 ;
+  double (*arg2)[3] ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "molecule_xform", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_molecule, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "molecule_xform" "', argument " "1"" of type '" "struct molecule *""'"); 
+  }
+  arg1 = (struct molecule *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_a_3__double, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "molecule_xform" "', argument " "2"" of type '" "double [3][3]""'"); 
+  } 
+  arg2 = (double (*)[3])(argp2);
+  molecule_xform(arg1,(double (*)[3])arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *molecule_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
@@ -5684,6 +5935,12 @@ static PyMethodDef SwigMethods[] = {
 	 { "delete_bond", _wrap_delete_bond, METH_O, NULL},
 	 { "bond_swigregister", bond_swigregister, METH_O, NULL},
 	 { "bond_swiginit", bond_swiginit, METH_VARARGS, NULL},
+	 { "mx_wrapper_xform_matrix_set", _wrap_mx_wrapper_xform_matrix_set, METH_VARARGS, NULL},
+	 { "mx_wrapper_xform_matrix_get", _wrap_mx_wrapper_xform_matrix_get, METH_O, NULL},
+	 { "new_mx_wrapper", _wrap_new_mx_wrapper, METH_VARARGS, NULL},
+	 { "delete_mx_wrapper", _wrap_delete_mx_wrapper, METH_O, NULL},
+	 { "mx_wrapper_swigregister", mx_wrapper_swigregister, METH_O, NULL},
+	 { "mx_wrapper_swiginit", mx_wrapper_swiginit, METH_VARARGS, NULL},
 	 { "molecule_atom_max_set", _wrap_molecule_atom_max_set, METH_VARARGS, NULL},
 	 { "molecule_atom_max_get", _wrap_molecule_atom_max_get, METH_O, NULL},
 	 { "molecule_atom_no_set", _wrap_molecule_atom_no_set, METH_VARARGS, NULL},
@@ -5707,6 +5964,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "molecule_get_atom", _wrap_molecule_get_atom, METH_VARARGS, NULL},
 	 { "molecule_get_bond", _wrap_molecule_get_bond, METH_VARARGS, NULL},
 	 { "molecule_sort", _wrap_molecule_sort, METH_O, NULL},
+	 { "molecule_xform", _wrap_molecule_xform, METH_VARARGS, NULL},
 	 { "molecule_swigregister", molecule_swigregister, METH_O, NULL},
 	 { "molecule_swiginit", molecule_swiginit, METH_VARARGS, NULL},
 	 { "atomset", _wrap_atomset, METH_VARARGS, NULL},
@@ -5740,6 +5998,7 @@ static swig_type_info _swigt__p_bond = {"_p_bond", "bond *|struct bond *", 0, 0,
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_molecule = {"_p_molecule", "molecule *|struct molecule *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_mx_wrapper = {"_p_mx_wrapper", "mx_wrapper *|struct mx_wrapper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_atom = {"_p_p_atom", "atom **|struct atom **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_bond = {"_p_p_bond", "bond **|struct bond **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *", 0, 0, (void*)0, 0};
@@ -5753,6 +6012,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
   &_swigt__p_double,
   &_swigt__p_molecule,
+  &_swigt__p_mx_wrapper,
   &_swigt__p_p_atom,
   &_swigt__p_p_bond,
   &_swigt__p_unsigned_char,
@@ -5766,6 +6026,7 @@ static swig_cast_info _swigc__p_bond[] = {  {&_swigt__p_bond, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_molecule[] = {  {&_swigt__p_molecule, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_mx_wrapper[] = {  {&_swigt__p_mx_wrapper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_atom[] = {  {&_swigt__p_p_atom, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_bond[] = {  {&_swigt__p_p_bond, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
@@ -5779,6 +6040,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
   _swigc__p_double,
   _swigc__p_molecule,
+  _swigc__p_mx_wrapper,
   _swigc__p_p_atom,
   _swigc__p_p_bond,
   _swigc__p_unsigned_char,

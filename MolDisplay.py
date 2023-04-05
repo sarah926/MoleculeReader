@@ -41,7 +41,7 @@ class Bond:
 
 class Molecule(molecule.molecule):
     def __str__(self):
-        return '''%d'%d'%d'%d"''' % self.atom_max, self.atom_no, self.bond_max, self.bond_no;
+        return '''%lf'%d'%d'%d"''' % (Atom(self.get_atom(1)).z, Atom(self.get_atom(2)).z, self.get_atom(2).z, self.bond_no);
     def svg(self, rad, el, grad):
         stacka = [];
         stackb = [];
@@ -51,63 +51,41 @@ class Molecule(molecule.molecule):
             stackb.append(Bond(self.get_bond(i)));
         for i in range(self.atom_no-1, -1, -1):
             stacka.append(Atom(self.get_atom(i)));
+        
         a1 = stacka.pop();
         b1 = stackb.pop();
-        
         while (len(stacka) != 0) and (len(stackb) != 0):
-            if a1.z <= b1.z:
+            if a1.z < b1.z:
                 returning = returning + a1.svg(rad, el);
                 a1 = stacka.pop();
             else:
                 returning = returning + b1.svg();
                 b1 = stackb.pop();
-        while(True): 
-            returning = returning + a1.svg(rad, el);
-            if len(stacka) == 0:
+        #b finished first - only one b left
+        while(len(stacka)>0):
+            if a1.z < b1.z:
+                returning = returning + a1.svg(rad, el);
+                a1 = stacka.pop();
+            else:
+                returning = returning + b1.svg();
+                while(len(stacka)>0):
+                    returning = returning + a1.svg(rad,el);
+     
+                    a1 = stacka.pop();
+                returning = returning + a1.svg(rad,el);
                 break;
-            a1 = stacka.pop();
-        while(True):
-            returning = returning + b1.svg();
-            if len(stackb) == 0:
+        while(len(stackb)>0):
+            if a1.z < b1.z:
+                returning = returning + a1.svg(rad, el);
+                while(len(stackb)>0):
+                    returning = returning + b1.svg();
+                    b1 = stackb.pop();
+                returning = returning + b1.svg();
                 break;
-            b1 = stackb.pop();
-
-        # if(len(stackb)==0):
-        #     #b is the one that only has one left
-        #     while(len(stacka)>0):
-        #         if(b1.z >= a1.z):
-        #             returning = returning + a1.svg();
-        #             print(a1.z)
-        #             print("atom")
-        #             a1 = stacka.pop();
-        #         else:
-        #             returning = returning + b1.svg();
-        #             print(b1.z)
-        #             print("bond")
-        #             break;
-        #     while(len(stacka)>0):
-        #         returning = returning + a1.svg();
-        #         print(a1.z)
-        #         a1 = stacka.pop();
-        #     returning = returning + a1.svg();
-        # else:
-        #     #b is the one that only has one left
-        #     while(len(stackb)>0):
-        #         if(a1.z >= b1.z):
-        #             returning = returning + b1.svg();
-        #             print(b1.z);
-        #             print("bond");
-        #             b1 = stackb.pop();
-        #         else:
-        #             returning = returning + a1.svg();
-        #             print(a1.z)
-        #             print("atom")
-        #             break;
-        #     while(len(stackb)>0):
-        #         returning = returning + b1.svg();
-        #         print(b1.z)
-        #         b1 = stacka.pop();
-        #     returning = returning + b1.svg();
+            else:
+                returning = returning + b1.svg();
+                b1 = stackb.pop();
+       
         return header + grad + returning + footer;
     def parse(self, file):
         totalLines = file.readlines();

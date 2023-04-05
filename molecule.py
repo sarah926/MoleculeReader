@@ -95,6 +95,17 @@ class bond(object):
 
 # Register bond in _molecule:
 _molecule.bond_swigregister(bond)
+class mx_wrapper(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    xform_matrix = property(_molecule.mx_wrapper_xform_matrix_get, _molecule.mx_wrapper_xform_matrix_set)
+
+    def __init__(self, xrot, yrot, zrot):
+        _molecule.mx_wrapper_swiginit(self, _molecule.new_mx_wrapper(xrot, yrot, zrot))
+    __swig_destroy__ = _molecule.delete_mx_wrapper
+
+# Register mx_wrapper in _molecule:
+_molecule.mx_wrapper_swigregister(mx_wrapper)
 class molecule(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -125,6 +136,9 @@ class molecule(object):
 
     def sort(self):
         return _molecule.molecule_sort(self)
+
+    def xform(self, xform_matrix):
+        return _molecule.molecule_xform(self, xform_matrix)
 
 # Register molecule in _molecule:
 _molecule.molecule_swigregister(molecule)
